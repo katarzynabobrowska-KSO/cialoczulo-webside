@@ -118,6 +118,13 @@
       font-size: 0.85rem;
       background: #fff;
       border: 1px solid #e4ebe4;
+      font: inherit;
+      color: inherit;
+      padding: 0;
+    }
+    .calendar-day:disabled {
+      cursor: default;
+      opacity: 0.55;
     }
     .calendar-day.empty { visibility: hidden; }
     .calendar-day.has-class {
@@ -130,6 +137,17 @@
       background: #3d6b4f;
       color: #fff;
     }
+    .calendar-day-detail {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #d4ddd4;
+      border-radius: 10px;
+    }
+    .calendar-day-detail h3 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+    }
     .schedule-list {
       list-style: none;
       padding: 0;
@@ -137,7 +155,9 @@
       display: grid;
       gap: 0.75rem;
     }
-    .schedule-item {
+    .schedule-list > li { list-style: none; }
+    .session-cards { display: grid; gap: 0.75rem; }
+    .session-card {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -148,17 +168,12 @@
       border: 1px solid #d4ddd4;
       border-radius: 10px;
     }
-    .schedule-item.is-full { opacity: 0.75; }
-    .schedule-meta { margin: 0; font-size: 0.9rem; color: #5a6b5a; }
-    .badge {
-      display: inline-block;
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      font-weight: 600;
+    .schedule-meta { margin: 0.25rem 0 0; font-size: 0.9rem; color: #5a6b5a; }
+    .schedule-location { margin: 0.35rem 0 0; font-size: 0.9rem; }
+    .btn-signup {
+      margin-top: 0;
+      white-space: nowrap;
     }
-    .badge-open { background: #d8e8d8; color: #2c5a3d; }
-    .badge-full { background: #f0dede; color: #8b3a3a; }
     .signup-form {
       display: grid;
       gap: 1rem;
@@ -228,7 +243,7 @@
     <section id="zajecia" class="panel">
       <span class="back" tabindex="0">← Wróć do kart</span>
       <h2>Zajęcia — kalendarz</h2>
-      <p class="hint">Przykładowy harmonogram na czerwiec 2026. Liczba miejsc aktualizujesz ręcznie w kodzie albo później przez Formspree / Google Sheets.</p>
+      <p class="hint">Pojedyncze terminy edytujesz w pliku <code>js/zajecia-data.js</code>. Kliknij dzień z zajęciami, żeby zobaczyć szczegóły.</p>
 
       <div class="calendar-nav">
         <button type="button" id="prev-month" aria-label="Poprzedni miesiąc">←</button>
@@ -236,8 +251,9 @@
         <button type="button" id="next-month" aria-label="Następny miesiąc">→</button>
       </div>
       <div class="calendar-grid" id="calendar-grid" aria-label="Kalendarz zajęć"></div>
+      <div id="calendar-day-detail" class="calendar-day-detail" hidden></div>
 
-      <h3>Nadchodzące terminy</h3>
+      <h3>Lista zajęć</h3>
       <ul class="schedule-list" id="schedule-list"></ul>
     </section>
 
@@ -297,153 +313,7 @@
     </section>
   </div>
 
-  <script>
-    const cards = document.querySelectorAll(".card");
-    const panels = document.querySelectorAll(".panel");
-    const cardGrid = document.querySelector(".cards");
-
-    const classes = [
-      { id: "2026-06-03-18", date: "2026-06-03", time: "18:00", title: "Hatha joga", capacity: 10, booked: 7 },
-      { id: "2026-06-05-10", date: "2026-06-05", time: "10:00", title: "Hatha joga", capacity: 10, booked: 10 },
-      { id: "2026-06-10-18", date: "2026-06-10", time: "18:00", title: "Hatha joga", capacity: 10, booked: 4 },
-      { id: "2026-06-12-10", date: "2026-06-12", time: "10:00", title: "Joga relaksacyjna", capacity: 8, booked: 2 },
-      { id: "2026-06-17-18", date: "2026-06-17", time: "18:00", title: "Hatha joga", capacity: 10, booked: 6 },
-      { id: "2026-06-19-10", date: "2026-06-19", time: "10:00", title: "Hatha joga", capacity: 10, booked: 1 },
-      { id: "2026-06-24-18", date: "2026-06-24", time: "18:00", title: "Joga relaksacyjna", capacity: 8, booked: 8 },
-      { id: "2026-06-26-10", date: "2026-06-26", time: "10:00", title: "Hatha joga", capacity: 10, booked: 3 }
-    ];
-
-    const weekdays = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"];
-    let calendarMonth = new Date(2026, 5, 1);
-
-    function spotsLeft(item) {
-      return Math.max(item.capacity - item.booked, 0);
-    }
-
-    function formatPolishDate(dateStr) {
-      return new Date(dateStr + "T12:00:00").toLocaleDateString("pl-PL", {
-        weekday: "long",
-        day: "numeric",
-        month: "long"
-      });
-    }
-
-    function renderScheduleList() {
-      const list = document.getElementById("schedule-list");
-      list.innerHTML = classes.map(item => {
-        const free = spotsLeft(item);
-        const full = free === 0;
-        return `
-          <li class="schedule-item${full ? " is-full" : ""}">
-            <div>
-              <strong>${item.title}</strong>
-              <p class="schedule-meta">${formatPolishDate(item.date)} · ${item.time}</p>
-            </div>
-            <span class="badge ${full ? "badge-full" : "badge-open"}">
-              ${full ? "Brak miejsc" : `${free} wolne / ${item.capacity}`}
-            </span>
-          </li>
-        `;
-      }).join("");
-    }
-
-    function renderCalendar() {
-      const grid = document.getElementById("calendar-grid");
-      const title = document.getElementById("calendar-title");
-      const year = calendarMonth.getFullYear();
-      const month = calendarMonth.getMonth();
-      const firstDay = new Date(year, month, 1);
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const startOffset = (firstDay.getDay() + 6) % 7;
-      const classDays = new Set(
-        classes
-          .filter(item => {
-            const d = new Date(item.date + "T12:00:00");
-            return d.getFullYear() === year && d.getMonth() === month;
-          })
-          .map(item => Number(item.date.slice(-2)))
-      );
-
-      title.textContent = firstDay.toLocaleDateString("pl-PL", { month: "long", year: "numeric" });
-
-      let html = weekdays.map(day => `<span class="weekday">${day}</span>`).join("");
-      for (let i = 0; i < startOffset; i += 1) {
-        html += `<span class="calendar-day empty" aria-hidden="true"></span>`;
-      }
-      for (let day = 1; day <= daysInMonth; day += 1) {
-        const hasClass = classDays.has(day);
-        html += `<span class="calendar-day${hasClass ? " has-class" : ""}"${hasClass ? ` title="Są zajęcia"` : ""}>${day}</span>`;
-      }
-      grid.innerHTML = html;
-    }
-
-    function renderClassSelect() {
-      const select = document.getElementById("class");
-      select.innerHTML = [
-        `<option value="">— wybierz termin —</option>`,
-        ...classes.map(item => {
-          const free = spotsLeft(item);
-          const label = `${formatPolishDate(item.date)}, ${item.time} — ${item.title}`;
-          return `<option value="${item.id}"${free === 0 ? " disabled" : ""}>${label}${free === 0 ? " (brak miejsc)" : ` (${free} wolne)`}</option>`;
-        })
-      ].join("");
-    }
-
-    function openPanel(id) {
-      panels.forEach(p => p.classList.remove("is-open"));
-      cardGrid.style.display = "none";
-      document.getElementById(id).classList.add("is-open");
-    }
-
-    function closePanels() {
-      panels.forEach(p => p.classList.remove("is-open"));
-      cardGrid.style.display = "grid";
-    }
-
-    cards.forEach(card => {
-      card.addEventListener("click", () => openPanel(card.dataset.panel));
-    });
-
-    document.querySelectorAll(".back").forEach(btn => {
-      btn.addEventListener("click", closePanels);
-      btn.addEventListener("keydown", e => {
-        if (e.key === "Enter" || e.key === " ") closePanels();
-      });
-    });
-
-    document.getElementById("prev-month").addEventListener("click", () => {
-      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
-      renderCalendar();
-    });
-
-    document.getElementById("next-month").addEventListener("click", () => {
-      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
-      renderCalendar();
-    });
-
-    const signupForm = document.getElementById("signup-form");
-    const formSuccess = document.getElementById("form-success");
-
-    signupForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const response = await fetch(signupForm.action, {
-        method: "POST",
-        body: new FormData(signupForm),
-        headers: { Accept: "application/json" }
-      });
-
-      if (response.ok) {
-        signupForm.reset();
-        renderClassSelect();
-        formSuccess.classList.add("is-visible");
-      } else {
-        alert("Nie udało się wysłać formularza. Spróbuj maila: twoj@email.pl");
-      }
-    });
-
-    renderCalendar();
-    renderScheduleList();
-    renderClassSelect();
-  </script>
+  <script src="js/zajecia-data.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
