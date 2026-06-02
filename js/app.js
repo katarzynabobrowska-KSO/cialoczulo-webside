@@ -71,20 +71,30 @@
 
   function sessionCardHtml(item) {
     return `
-      <article class="session-card">
-        <div>
-          <strong>${item.title}</strong>
+      <div class="session-card">
+        <div class="session-card-body">
+          <p class="session-title">${item.title}</p>
           <p class="schedule-meta">${formatPolishDate(item.date)} · ${item.time}</p>
           <p class="schedule-location">${item.location}</p>
         </div>
-        <button type="button" class="button small btn-signup" data-class-id="${item.id}">Zapisz się</button>
-      </article>
+        <a href="#kontakt" class="button small primary btn-signup" data-class-id="${item.id}">Zapisz się</a>
+      </div>
     `;
+  }
+
+  function stopPanelClose(event) {
+    event.stopPropagation();
   }
 
   function bindSignupButtons(root) {
     root.querySelectorAll(".btn-signup").forEach((btn) => {
-      btn.addEventListener("click", () => openSignup(btn.dataset.classId));
+      btn.addEventListener("click", (event) => {
+        stopPanelClose(event);
+        const select = document.getElementById("class");
+        if (select && btn.dataset.classId) {
+          select.value = btn.dataset.classId;
+        }
+      });
     });
   }
 
@@ -139,7 +149,8 @@
     grid.innerHTML = html;
 
     grid.querySelectorAll(".calendar-day.has-class").forEach((btn) => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", (event) => {
+        stopPanelClose(event);
         selectedDay = { year, month, day: Number(btn.dataset.day) };
         renderCalendar();
         renderDayDetail(year, month, selectedDay.day);
@@ -165,26 +176,13 @@
     ].join("");
   }
 
-  function openSignup(classId) {
-    const select = document.getElementById("class");
-    if (select) select.value = classId;
-
-    const navLink = document.querySelector('nav a[href="#kontakt"]');
-    if (navLink) {
-      navLink.click();
-      window.setTimeout(() => {
-        const form = document.getElementById("signup-form");
-        if (form) form.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      }, 400);
-    }
-  }
-
   function bindUi() {
     const prev = document.getElementById("prev-month");
     const next = document.getElementById("next-month");
 
     if (prev) {
-      prev.addEventListener("click", () => {
+      prev.addEventListener("click", (event) => {
+        stopPanelClose(event);
         calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
         selectedDay = null;
         renderCalendar();
@@ -192,7 +190,8 @@
     }
 
     if (next) {
-      next.addEventListener("click", () => {
+      next.addEventListener("click", (event) => {
+        stopPanelClose(event);
         calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
         selectedDay = null;
         renderCalendar();

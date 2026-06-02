@@ -102,12 +102,31 @@
 .session-card {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75em;
   padding: 1em;
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
+}
+
+.session-card-body {
+  flex: 1;
+  min-width: 12rem;
+}
+
+.session-title {
+  margin: 0 0 0.35em;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.session-card .button {
+  flex-shrink: 0;
+  margin: 0;
 }
 
 .schedule-meta {
