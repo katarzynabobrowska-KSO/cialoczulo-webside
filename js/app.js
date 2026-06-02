@@ -176,6 +176,37 @@
     ].join("");
   }
 
+  function renderClassTypes() {
+    const container = document.getElementById("class-types-list");
+    if (!container) return;
+
+    const types = window.TYPY_ZAJEC_DATA || [];
+    container.innerHTML = types
+      .map(
+        (type) => `
+      <div class="class-type-card">
+        <span class="image main class-type-image">
+          <img src="${type.image}" alt="${type.title}" loading="lazy" />
+        </span>
+        <p class="class-type-title">${type.title}</p>
+        <p class="class-type-description">${type.description}</p>
+        <p class="class-type-address">
+          <span class="class-type-label">Gdzie:</span> ${type.address}
+        </p>
+        <ul class="actions class-type-actions">
+          <li><a href="#zajecia" class="button small">Zobacz terminy</a></li>
+          <li><a href="#kontakt" class="button small primary">Zapisz się</a></li>
+        </ul>
+      </div>
+    `
+      )
+      .join("");
+
+    container.querySelectorAll(".class-type-actions a").forEach((link) => {
+      link.addEventListener("click", stopPanelClose);
+    });
+  }
+
   function bindUi() {
     const prev = document.getElementById("prev-month");
     const next = document.getElementById("next-month");
@@ -228,6 +259,7 @@
       calendarMonth = new Date(first.getFullYear(), first.getMonth(), 1);
     }
     bindUi();
+    renderClassTypes();
     renderCalendar();
     renderScheduleList();
     renderClassSelect();

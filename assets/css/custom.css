@@ -151,3 +151,58 @@
 .form-success.is-visible {
   display: block;
 }
+
+/* Rodzaje zajęć — karty z opisem i zdjęciem */
+
+.class-types-list {
+  display: grid;
+  gap: 2em;
+}
+
+.class-type-card {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding-bottom: 0.5em;
+}
+
+.class-type-image {
+  margin-bottom: 1em;
+}
+
+.class-type-image img {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.class-type-title {
+  margin: 0 0 0.75em;
+  font-size: 1.05em;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.class-type-description {
+  margin: 0 0 1em;
+}
+
+.class-type-address {
+  margin: 0 0 1.25em;
+  font-size: 0.95em;
+}
+
+.class-type-label {
+  display: block;
+  font-size: 0.75em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.75;
+  margin-bottom: 0.25em;
+}
+
+.class-type-actions {
+  margin-bottom: 0;
+}
