@@ -1,8 +1,4 @@
 (function () {
-  const cards = document.querySelectorAll(".card");
-  const panels = document.querySelectorAll(".panel");
-  const cardGrid = document.querySelector(".cards");
-
   let classes = [];
   let selectedDay = null;
   const weekdays = ["Pn", "Wt", "Śr", "Cz", "Pt", "So", "Nd"];
@@ -47,11 +43,7 @@
   }
 
   function sortedClasses() {
-    return [...classes].sort((a, b) => {
-      const aKey = `${a.date}T${a.time}`;
-      const bKey = `${b.date}T${b.time}`;
-      return aKey.localeCompare(bKey);
-    });
+    return [...classes].sort((a, b) => `${a.date}T${a.time}`.localeCompare(`${b.date}T${b.time}`));
   }
 
   function classesOnDate(year, month, day) {
@@ -67,8 +59,7 @@
       try {
         const response = await fetch(url);
         if (response.ok) {
-          const csv = await response.text();
-          const fromSheets = parseCsvToClasses(csv);
+          const fromSheets = parseCsvToClasses(await response.text());
           if (fromSheets.length) return fromSheets;
         }
       } catch (error) {
@@ -86,7 +77,7 @@
           <p class="schedule-meta">${formatPolishDate(item.date)} · ${item.time}</p>
           <p class="schedule-location">${item.location}</p>
         </div>
-        <button type="button" class="btn btn-signup" data-class-id="${item.id}">Zapisz się</button>
+        <button type="button" class="button small btn-signup" data-class-id="${item.id}">Zapisz się</button>
       </article>
     `;
   }
@@ -141,99 +132,94 @@
       html += `<span class="calendar-day empty" aria-hidden="true"></span>`;
     }
     for (let day = 1; day <= daysInMonth; day += 1) {
-      const dayClasses = classesOnDate(year, month, day);
-      const hasClass = dayClasses.length > 0;
+      const hasClass = classesOnDate(year, month, day).length > 0;
       const isSelected = selectedDay && selectedDay.year === year && selectedDay.month === month && selectedDay.day === day;
-      html += `<button type="button" class="calendar-day${hasClass ? " has-class" : ""}${isSelected ? " selected" : ""}" data-day="${day}"${hasClass ? "" : " disabled"} aria-label="${hasClass ? `Zajęcia ${day}. dnia miesiąca` : `${day}. dzień bez zajęć`}">${day}</button>`;
+      html += `<button type="button" class="calendar-day${hasClass ? " has-class" : ""}${isSelected ? " selected" : ""}" data-day="${day}"${hasClass ? "" : " disabled"}>${day}</button>`;
     }
     grid.innerHTML = html;
 
     grid.querySelectorAll(".calendar-day.has-class").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const day = Number(btn.dataset.day);
-        selectedDay = { year, month, day };
+        selectedDay = { year, month, day: Number(btn.dataset.day) };
         renderCalendar();
-        renderDayDetail(year, month, day);
+        renderDayDetail(year, month, selectedDay.day);
       });
     });
 
     if (selectedDay && selectedDay.year === year && selectedDay.month === month) {
       renderDayDetail(year, month, selectedDay.day);
     } else {
-      document.getElementById("calendar-day-detail").hidden = true;
+      const detail = document.getElementById("calendar-day-detail");
+      if (detail) {
+        detail.hidden = true;
+      }
     }
   }
 
   function renderClassSelect() {
     const select = document.getElementById("class");
+    if (!select) return;
     select.innerHTML = [
       `<option value="">— wybierz termin —</option>`,
-      ...sortedClasses().map((item) => {
-        return `<option value="${item.id}">${formatClassLabel(item)}</option>`;
-      })
+      ...sortedClasses().map((item) => `<option value="${item.id}">${formatClassLabel(item)}</option>`)
     ].join("");
   }
 
-  function openPanel(id) {
-    panels.forEach((p) => p.classList.remove("is-open"));
-    cardGrid.style.display = "none";
-    document.getElementById(id).classList.add("is-open");
-  }
-
-  function closePanels() {
-    panels.forEach((p) => p.classList.remove("is-open"));
-    cardGrid.style.display = "grid";
-  }
-
   function openSignup(classId) {
-    openPanel("kontakt");
     const select = document.getElementById("class");
-    select.value = classId;
-    document.getElementById("signup-form").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (select) select.value = classId;
+
+    const navLink = document.querySelector('nav a[href="#kontakt"]');
+    if (navLink) {
+      navLink.click();
+      window.setTimeout(() => {
+        const form = document.getElementById("signup-form");
+        if (form) form.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 400);
+    }
   }
 
   function bindUi() {
-    cards.forEach((card) => {
-      card.addEventListener("click", () => openPanel(card.dataset.panel));
-    });
+    const prev = document.getElementById("prev-month");
+    const next = document.getElementById("next-month");
 
-    document.querySelectorAll(".back").forEach((btn) => {
-      btn.addEventListener("click", closePanels);
-      btn.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") closePanels();
+    if (prev) {
+      prev.addEventListener("click", () => {
+        calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
+        selectedDay = null;
+        renderCalendar();
       });
-    });
+    }
 
-    document.getElementById("prev-month").addEventListener("click", () => {
-      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
-      selectedDay = null;
-      renderCalendar();
-    });
-
-    document.getElementById("next-month").addEventListener("click", () => {
-      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
-      selectedDay = null;
-      renderCalendar();
-    });
+    if (next) {
+      next.addEventListener("click", () => {
+        calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
+        selectedDay = null;
+        renderCalendar();
+      });
+    }
 
     const signupForm = document.getElementById("signup-form");
     const formSuccess = document.getElementById("form-success");
 
-    signupForm.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const response = await fetch(signupForm.action, {
-        method: "POST",
-        body: new FormData(signupForm),
-        headers: { Accept: "application/json" }
-      });
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const response = await fetch(signupForm.action, {
+          method: "POST",
+          body: new FormData(signupForm),
+          headers: { Accept: "application/json" }
+        });
 
-      if (response.ok) {
-        signupForm.reset();
-        formSuccess.classList.add("is-visible");
-      } else {
-        alert("Nie udało się wysłać formularza. Spróbuj maila: twoj@email.pl");
-      }
-    });
+        if (response.ok) {
+          signupForm.reset();
+          renderClassSelect();
+          if (formSuccess) formSuccess.classList.add("is-visible");
+        } else {
+          alert("Nie udało się wysłać formularza. Spróbuj maila: twoj@email.pl");
+        }
+      });
+    }
   }
 
   async function init() {
@@ -248,5 +234,9 @@
     renderClassSelect();
   }
 
-  init();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
 })();

@@ -1,319 +1,137 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+<!--
+	Dimension by HTML5 UP — html5up.net | CCA 3.0 license
+	Dostosowane dla strony jogi.
+-->
 <html lang="pl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Joga — karty</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: #faf8f5;
-      color: #2c3e2c;
-      line-height: 1.6;
-    }
-    .wrap { max-width: 900px; margin: 0 auto; padding: 2rem 1rem; }
-    h1 { text-align: center; margin-bottom: 2rem; }
+	<head>
+		<title>Joga — Ciało czuło</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<link rel="stylesheet" href="assets/css/custom.css" />
+		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-preload">
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-    }
-    .card {
-      background: #fff;
-      border: 1px solid #d4ddd4;
-      border-radius: 12px;
-      padding: 1.25rem;
-      cursor: pointer;
-      text-align: center;
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-    .card:hover {
-      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-      transform: translateY(-2px);
-    }
-    .card h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-    .card p { margin: 0; font-size: 0.9rem; color: #5a6b5a; }
+		<div id="wrapper">
 
-    .panel {
-      display: none;
-      margin-top: 2rem;
-      padding: 1.5rem;
-      background: #e8f0e8;
-      border-radius: 12px;
-    }
-    .panel.is-open { display: block; }
-    .panel h2 { margin-top: 0; }
-    .back {
-      display: inline-block;
-      margin-bottom: 1rem;
-      color: #3d6b4f;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .btn {
-      display: inline-block;
-      margin-top: 1rem;
-      padding: 0.6rem 1rem;
-      background: #3d6b4f;
-      color: #fff;
-      text-decoration: none;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font: inherit;
-    }
-    .btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .hint {
-      font-size: 0.85rem;
-      color: #5a6b5a;
-      margin: 0.5rem 0 1rem;
-    }
-    .calendar-nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin: 1.5rem 0 1rem;
-    }
-    .calendar-nav h3 {
-      margin: 0;
-      font-size: 1.1rem;
-      text-transform: capitalize;
-    }
-    .calendar-nav button {
-      padding: 0.4rem 0.75rem;
-      border: 1px solid #d4ddd4;
-      border-radius: 6px;
-      background: #fff;
-      color: #2c3e2c;
-      cursor: pointer;
-    }
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.35rem;
-      margin-bottom: 1.5rem;
-    }
-    .calendar-grid span {
-      text-align: center;
-      font-size: 0.75rem;
-      padding: 0.35rem 0;
-    }
-    .calendar-grid .weekday {
-      font-weight: 600;
-      color: #5a6b5a;
-    }
-    .calendar-day {
-      aspect-ratio: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      background: #fff;
-      border: 1px solid #e4ebe4;
-      font: inherit;
-      color: inherit;
-      padding: 0;
-    }
-    .calendar-day:disabled {
-      cursor: default;
-      opacity: 0.55;
-    }
-    .calendar-day.empty { visibility: hidden; }
-    .calendar-day.has-class {
-      background: #d8e8d8;
-      border-color: #3d6b4f;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .calendar-day.selected {
-      background: #3d6b4f;
-      color: #fff;
-    }
-    .calendar-day-detail {
-      margin-bottom: 1.5rem;
-      padding: 1rem;
-      background: #fff;
-      border: 1px solid #d4ddd4;
-      border-radius: 10px;
-    }
-    .calendar-day-detail h3 {
-      margin: 0 0 0.75rem;
-      font-size: 1rem;
-    }
-    .schedule-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 0.75rem;
-    }
-    .schedule-list > li { list-style: none; }
-    .session-cards { display: grid; gap: 0.75rem; }
-    .session-card {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      padding: 1rem;
-      background: #fff;
-      border: 1px solid #d4ddd4;
-      border-radius: 10px;
-    }
-    .schedule-meta { margin: 0.25rem 0 0; font-size: 0.9rem; color: #5a6b5a; }
-    .schedule-location { margin: 0.35rem 0 0; font-size: 0.9rem; }
-    .btn-signup {
-      margin-top: 0;
-      white-space: nowrap;
-    }
-    .signup-form {
-      display: grid;
-      gap: 1rem;
-      max-width: 480px;
-      margin-top: 1rem;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 0.35rem;
-      font-weight: 600;
-      font-size: 0.9rem;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      padding: 0.65rem 0.75rem;
-      border: 1px solid #d4ddd4;
-      border-radius: 8px;
-      font: inherit;
-      background: #fff;
-    }
-    .form-note {
-      font-size: 0.85rem;
-      color: #5a6b5a;
-      margin: 0;
-    }
-    .form-success {
-      display: none;
-      padding: 1rem;
-      background: #d8e8d8;
-      border-radius: 8px;
-      margin-top: 1rem;
-    }
-    .form-success.is-visible { display: block; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <h1>Joga — wybierz sekcję</h1>
+			<header id="header">
+				<div class="logo">
+					<span class="icon fa-spa"></span>
+				</div>
+				<div class="content">
+					<div class="inner">
+						<h1>Joga</h1>
+						<p>Spokojne zajęcia · pojedyncze terminy · zapisy online</p>
+					</div>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="#o-mnie">O mnie</a></li>
+						<li><a href="#zajecia">Zajęcia</a></li>
+						<li><a href="#cennik">Cennik</a></li>
+						<li><a href="#kontakt">Kontakt</a></li>
+					</ul>
+				</nav>
+			</header>
 
-    <div class="cards">
-      <article class="card" data-panel="o-mnie">
-        <h2>O mnie</h2>
-        <p>Kim jestem i jak uczę</p>
-      </article>
-      <article class="card" data-panel="zajecia">
-        <h2>Zajęcia</h2>
-        <p>Terminy i miejsce</p>
-      </article>
-      <article class="card" data-panel="cennik">
-        <h2>Cennik</h2>
-        <p>Ceny i karnety</p>
-      </article>
-      <article class="card" data-panel="kontakt">
-        <h2>Kontakt</h2>
-        <p>Zapisy i wiadomość</p>
-      </article>
-    </div>
+			<div id="main">
 
-    <section id="o-mnie" class="panel">
-      <span class="back" tabindex="0">← Wróć do kart</span>
-      <h2>O mnie</h2>
-      <p>Tu wklejasz opis z Facebooka lub własny tekst.</p>
-    </section>
+				<article id="o-mnie">
+					<h2 class="major">O mnie</h2>
+					<span class="image main"><img src="images/pic01.jpg" alt="Joga" /></span>
+					<p>Tu wklejasz opis z Facebooka lub własny tekst — kim jesteś, jak uczysz, dla kogo są zajęcia.</p>
+					<p>Stawiam na spokojne tempo, oddech i bezpieczną pracę z ciałem. Na zajęciach nie musisz być elastyczna — wystarczy chęć i mata.</p>
+				</article>
 
-    <section id="zajecia" class="panel">
-      <span class="back" tabindex="0">← Wróć do kart</span>
-      <h2>Zajęcia — kalendarz</h2>
-      <p class="hint">Pojedyncze terminy edytujesz w pliku <code>js/zajecia-data.js</code>. Kliknij dzień z zajęciami, żeby zobaczyć szczegóły.</p>
+				<article id="zajecia">
+					<h2 class="major">Zajęcia</h2>
+					<p class="hint">Pojedyncze terminy edytujesz w pliku <code>js/zajecia-data.js</code>. Kliknij dzień z zajęciami, żeby zobaczyć szczegóły.</p>
 
-      <div class="calendar-nav">
-        <button type="button" id="prev-month" aria-label="Poprzedni miesiąc">←</button>
-        <h3 id="calendar-title"></h3>
-        <button type="button" id="next-month" aria-label="Następny miesiąc">→</button>
-      </div>
-      <div class="calendar-grid" id="calendar-grid" aria-label="Kalendarz zajęć"></div>
-      <div id="calendar-day-detail" class="calendar-day-detail" hidden></div>
+					<div class="calendar-nav">
+						<button type="button" class="button small" id="prev-month" aria-label="Poprzedni miesiąc">←</button>
+						<h3 id="calendar-title"></h3>
+						<button type="button" class="button small" id="next-month" aria-label="Następny miesiąc">→</button>
+					</div>
+					<div class="calendar-grid" id="calendar-grid" aria-label="Kalendarz zajęć"></div>
+					<div id="calendar-day-detail" class="calendar-day-detail" hidden></div>
 
-      <h3>Lista zajęć</h3>
-      <ul class="schedule-list" id="schedule-list"></ul>
-    </section>
+					<h3 class="major">Lista zajęć</h3>
+					<ul class="schedule-list" id="schedule-list"></ul>
+				</article>
 
-    <section id="cennik" class="panel">
-      <span class="back" tabindex="0">← Wróć do kart</span>
-      <h2>Cennik</h2>
-      <p>Wejście 50 zł, karnet 180 zł.</p>
-    </section>
+				<article id="cennik">
+					<h2 class="major">Cennik</h2>
+					<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
+					<ul>
+						<li>Pojedyncze wejście — 50 zł</li>
+						<li>Karnet 4 wejścia — 180 zł</li>
+					</ul>
+					<p><em>Zapisy przez formularz w sekcji Kontakt.</em></p>
+				</article>
 
-    <section id="kontakt" class="panel">
-      <span class="back" tabindex="0">← Wróć do kart</span>
-      <h2>Kontakt i zapisy</h2>
-      <p>Napisz: <a href="mailto:twoj@email.pl">twoj@email.pl</a> · <a href="https://instagram.com/">Instagram</a></p>
+				<article id="kontakt">
+					<h2 class="major">Kontakt i zapisy</h2>
+					<p>Napisz: <a href="mailto:twoj@email.pl">twoj@email.pl</a></p>
 
-      <form
-        class="signup-form"
-        id="signup-form"
-        action="https://formspree.io/f/xredwdlp"
-        method="POST"
-      >
-        <p class="form-note">
-          Formularz wysyła zgłoszenia na Twój e-mail przez Formspree.
-        </p>
+					<form method="post" action="https://formspree.io/f/xredwdlp" id="signup-form">
+						<div class="fields">
+							<div class="field half">
+								<label for="name">Imię i nazwisko</label>
+								<input type="text" name="name" id="name" required autocomplete="name" />
+							</div>
+							<div class="field half">
+								<label for="email">E-mail</label>
+								<input type="email" name="email" id="email" required autocomplete="email" />
+							</div>
+							<div class="field half">
+								<label for="phone">Telefon (opcjonalnie)</label>
+								<input type="tel" name="phone" id="phone" autocomplete="tel" />
+							</div>
+							<div class="field half">
+								<label for="class">Zajęcia</label>
+								<select name="zajecia" id="class" required>
+									<option value="">— wybierz termin —</option>
+								</select>
+							</div>
+							<div class="field">
+								<label for="message">Wiadomość (opcjonalnie)</label>
+								<textarea name="message" id="message" rows="4" placeholder="Np. pierwszy raz na macie"></textarea>
+							</div>
+						</div>
+						<input type="hidden" name="_subject" value="Nowy zapis na zajęcia jogi" />
+						<ul class="actions">
+							<li><input type="submit" value="Wyślij zgłoszenie" class="primary" /></li>
+						</ul>
+					</form>
 
-        <div class="form-group">
-          <label for="name">Imię i nazwisko</label>
-          <input id="name" name="name" type="text" required autocomplete="name">
-        </div>
+					<p class="form-success" id="form-success" role="status">
+						Dziękujemy! Zgłoszenie zostało wysłane. Odezwę się wkrótce.
+					</p>
 
-        <div class="form-group">
-          <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" required autocomplete="email">
-        </div>
+					<ul class="icons">
+						<li><a href="https://instagram.com/" class="icon brands fa-instagram" target="_blank" rel="noopener"><span class="label">Instagram</span></a></li>
+					</ul>
+				</article>
 
-        <div class="form-group">
-          <label for="phone">Telefon (opcjonalnie)</label>
-          <input id="phone" name="phone" type="tel" autocomplete="tel">
-        </div>
+			</div>
 
-        <div class="form-group">
-          <label for="class">Zajęcia, na które chcesz się zapisać</label>
-          <select id="class" name="zajecia" required></select>
-        </div>
+			<footer id="footer">
+				<p class="copyright">&copy; Joga · Szablon: <a href="https://html5up.net">HTML5 UP</a></p>
+			</footer>
 
-        <div class="form-group">
-          <label for="message">Wiadomość (opcjonalnie)</label>
-          <textarea id="message" name="message" rows="3" placeholder="Np. pierwszy raz na macie, proszę o info dla początkujących"></textarea>
-        </div>
+		</div>
 
-        <input type="hidden" name="_subject" value="Nowy zapis na zajęcia jogi">
-        <button class="btn" type="submit">Wyślij zgłoszenie</button>
-      </form>
+		<div id="bg"></div>
 
-      <p class="form-success" id="form-success" role="status">
-        Dziękujemy! Zgłoszenie zostało wysłane. Odezwę się wkrótce.
-      </p>
-    </section>
-  </div>
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/browser.min.js"></script>
+		<script src="assets/js/breakpoints.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<script src="assets/js/main.js"></script>
+		<script src="js/zajecia-data.js"></script>
+		<script src="js/app.js"></script>
 
-  <script src="js/zajecia-data.js"></script>
-  <script src="js/app.js"></script>
-</body>
+	</body>
 </html>
