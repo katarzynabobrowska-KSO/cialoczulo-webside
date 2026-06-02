@@ -32,6 +32,7 @@
 						<li><a href="#o-mnie">O mnie</a></li>
 						<li><a href="#rodzaje-zajec">Rodzaje zajęć</a></li>
 						<li><a href="#zajecia">Terminy</a></li>
+						<li><a href="#wydarzenia">Wydarzenia</a></li>
 						<li><a href="#cennik">Cennik</a></li>
 						<li><a href="#kontakt">Kontakt</a></li>
 					</ul>
@@ -69,6 +70,12 @@
 					<ul class="schedule-list" id="schedule-list"></ul>
 				</article>
 
+				<article id="wydarzenia">
+					<h2 class="major">Wydarzenia</h2>
+					<p class="hint">Wydarzenia edytujesz w pliku <code>js/wydarzenia-data.js</code>. Link do Facebooka wklejasz w polu <code>facebookUrl</code>.</p>
+					<div class="class-types-list" id="events-list"></div>
+				</article>
+
 				<article id="cennik">
 					<h2 class="major">Cennik</h2>
 					<span class="image main"><img src="images/pic02.jpg" alt="" /></span>
@@ -97,10 +104,24 @@
 								<label for="phone">Telefon (opcjonalnie)</label>
 								<input type="tel" name="phone" id="phone" autocomplete="tel" />
 							</div>
-							<div class="field half">
-								<label for="class">Zajęcia</label>
-								<select name="zajecia" id="class" required>
+							<div class="field">
+								<label for="signup-type">Rodzaj zgłoszenia</label>
+								<select name="rodzaj" id="signup-type" required>
+									<option value="zajecia">Zapis na zajęcia</option>
+									<option value="wydarzenie">Zapis na wydarzenie</option>
+									<option value="wiadomosc">Inna wiadomość</option>
+								</select>
+							</div>
+							<div class="field" id="field-class-wrap">
+								<label for="class">Termin zajęć</label>
+								<select name="zajecia" id="class">
 									<option value="">— wybierz termin —</option>
+								</select>
+							</div>
+							<div class="field" id="field-event-wrap" hidden>
+								<label for="event">Wydarzenie</label>
+								<select name="wydarzenie" id="event">
+									<option value="">— wybierz wydarzenie —</option>
 								</select>
 							</div>
 							<div class="field">
@@ -140,6 +161,7 @@
 		<script src="assets/js/main.js"></script>
 		<script src="js/zajecia-data.js"></script>
 		<script src="js/typy-zajec-data.js"></script>
+		<script src="js/wydarzenia-data.js"></script>
 		<script src="js/app.js"></script>
 
 	</body>

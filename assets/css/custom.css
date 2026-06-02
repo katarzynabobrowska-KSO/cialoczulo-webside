@@ -206,3 +206,7 @@
 .class-type-actions {
   margin-bottom: 0;
 }
+
+.event-card .class-type-actions .button {
+  letter-spacing: 0.1rem;
+}

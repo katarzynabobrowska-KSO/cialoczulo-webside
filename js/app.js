@@ -86,14 +86,55 @@
     event.stopPropagation();
   }
 
-  function bindSignupButtons(root) {
-    root.querySelectorAll(".btn-signup").forEach((btn) => {
+  function formatEventLabel(item) {
+    if (item.date) {
+      return `${item.title} — ${formatPolishDate(item.date)}`;
+    }
+    return item.title;
+  }
+
+  function syncSignupFields() {
+    const typeSelect = document.getElementById("signup-type");
+    const classWrap = document.getElementById("field-class-wrap");
+    const eventWrap = document.getElementById("field-event-wrap");
+    const classSelect = document.getElementById("class");
+    const eventSelect = document.getElementById("event");
+
+    if (!typeSelect || !classWrap || !eventWrap) return;
+
+    const type = typeSelect.value;
+    const isClass = type === "zajecia";
+    const isEvent = type === "wydarzenie";
+
+    classWrap.hidden = !isClass;
+    eventWrap.hidden = !isEvent;
+    classSelect.required = isClass;
+    eventSelect.required = isEvent;
+
+    if (!isClass) classSelect.value = "";
+    if (!isEvent) eventSelect.value = "";
+  }
+
+  function prepareContactForm({ type = "zajecia", classId = "", eventId = "" } = {}) {
+    const typeSelect = document.getElementById("signup-type");
+    if (typeSelect) typeSelect.value = type;
+    syncSignupFields();
+
+    const classSelect = document.getElementById("class");
+    const eventSelect = document.getElementById("event");
+    if (classSelect && type === "zajecia" && classId) classSelect.value = classId;
+    if (eventSelect && type === "wydarzenie" && eventId) eventSelect.value = eventId;
+  }
+
+  function bindContactLinks(root) {
+    root.querySelectorAll(".btn-contact, .btn-signup").forEach((btn) => {
       btn.addEventListener("click", (event) => {
         stopPanelClose(event);
-        const select = document.getElementById("class");
-        if (select && btn.dataset.classId) {
-          select.value = btn.dataset.classId;
-        }
+        prepareContactForm({
+          type: btn.dataset.signupType || "zajecia",
+          classId: btn.dataset.classId || "",
+          eventId: btn.dataset.eventId || ""
+        });
       });
     });
   }
@@ -117,13 +158,13 @@
       <h3>${formatPolishDate(dateStr)}</h3>
       <div class="session-cards">${dayClasses.map(sessionCardHtml).join("")}</div>
     `;
-    bindSignupButtons(detail);
+    bindContactLinks(detail);
   }
 
   function renderScheduleList() {
     const list = document.getElementById("schedule-list");
     list.innerHTML = sortedClasses().map((item) => `<li>${sessionCardHtml(item)}</li>`).join("");
-    bindSignupButtons(list);
+    bindContactLinks(list);
   }
 
   function renderCalendar() {
@@ -181,9 +222,15 @@
     if (!container) return;
 
     const types = window.TYPY_ZAJEC_DATA || [];
-    container.innerHTML = types
-      .map(
-        (type) => `
+    container.innerHTML = types.map((type) => classTypeCardHtml(type)).join("");
+    bindContactLinks(container);
+    container.querySelectorAll(".class-type-actions a:not(.btn-contact)").forEach((link) => {
+      link.addEventListener("click", stopPanelClose);
+    });
+  }
+
+  function classTypeCardHtml(type) {
+    return `
       <div class="class-type-card">
         <span class="image main class-type-image">
           <img src="${type.image}" alt="${type.title}" loading="lazy" />
@@ -195,14 +242,53 @@
         </p>
         <ul class="actions class-type-actions">
           <li><a href="#zajecia" class="button small">Zobacz terminy</a></li>
-          <li><a href="#kontakt" class="button small primary">Zapisz się</a></li>
+          <li><a href="#kontakt" class="button small primary btn-contact" data-signup-type="zajecia">Zapisz się</a></li>
         </ul>
       </div>
-    `
-      )
-      .join("");
+    `;
+  }
 
-    container.querySelectorAll(".class-type-actions a").forEach((link) => {
+  function eventCardHtml(item) {
+    const dateLine = item.date
+      ? `<p class="schedule-meta">${formatPolishDate(item.date)}</p>`
+      : "";
+    return `
+      <div class="class-type-card event-card">
+        <span class="image main class-type-image">
+          <img src="${item.image}" alt="${item.title}" loading="lazy" />
+        </span>
+        <p class="class-type-title">${item.title}</p>
+        <p class="class-type-description">${item.description}</p>
+        ${dateLine}
+        <p class="class-type-address">
+          <span class="class-type-label">Gdzie:</span> ${item.location}
+        </p>
+        <ul class="actions class-type-actions">
+          <li><a href="${item.facebookUrl}" target="_blank" rel="noopener" class="button small icon brands fa-facebook-f">Facebook</a></li>
+          <li><a href="#kontakt" class="button small primary btn-contact" data-signup-type="wydarzenie" data-event-id="${item.id}">Zapisz się</a></li>
+        </ul>
+      </div>
+    `;
+  }
+
+  function renderEventSelect() {
+    const select = document.getElementById("event");
+    if (!select) return;
+    const events = window.WYDARZENIA_DATA || [];
+    select.innerHTML = [
+      `<option value="">— wybierz wydarzenie —</option>`,
+      ...events.map((item) => `<option value="${item.id}">${formatEventLabel(item)}</option>`)
+    ].join("");
+  }
+
+  function renderEvents() {
+    const container = document.getElementById("events-list");
+    if (!container) return;
+
+    const events = window.WYDARZENIA_DATA || [];
+    container.innerHTML = events.map((item) => eventCardHtml(item)).join("");
+    bindContactLinks(container);
+    container.querySelectorAll(".class-type-actions a[target='_blank']").forEach((link) => {
       link.addEventListener("click", stopPanelClose);
     });
   }
@@ -229,12 +315,28 @@
       });
     }
 
+    const signupType = document.getElementById("signup-type");
+    if (signupType) {
+      signupType.addEventListener("change", syncSignupFields);
+    }
+
     const signupForm = document.getElementById("signup-form");
     const formSuccess = document.getElementById("form-success");
 
     if (signupForm) {
       signupForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+
+        const type = document.getElementById("signup-type")?.value;
+        if (type === "zajecia" && !document.getElementById("class")?.value) {
+          alert("Wybierz termin zajęć.");
+          return;
+        }
+        if (type === "wydarzenie" && !document.getElementById("event")?.value) {
+          alert("Wybierz wydarzenie.");
+          return;
+        }
+
         const response = await fetch(signupForm.action, {
           method: "POST",
           body: new FormData(signupForm),
@@ -244,6 +346,8 @@
         if (response.ok) {
           signupForm.reset();
           renderClassSelect();
+          renderEventSelect();
+          syncSignupFields();
           if (formSuccess) formSuccess.classList.add("is-visible");
         } else {
           alert("Nie udało się wysłać formularza. Spróbuj maila: twoj@email.pl");
@@ -260,9 +364,12 @@
     }
     bindUi();
     renderClassTypes();
+    renderEvents();
     renderCalendar();
     renderScheduleList();
     renderClassSelect();
+    renderEventSelect();
+    syncSignupFields();
   }
 
   if (document.readyState === "loading") {
