@@ -1,0 +1,134 @@
+/* Kalendarz i lista zajęć — dopasowanie do szablonu Dimension */
+
+.hint {
+  font-size: 0.85em;
+  opacity: 0.85;
+  margin-bottom: 1.5em;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1.5em 0 1em;
+}
+
+.calendar-nav h3 {
+  margin: 0;
+  font-size: 1em;
+  text-transform: capitalize;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 1.5em;
+}
+
+.calendar-grid .weekday {
+  text-align: center;
+  font-size: 0.7em;
+  font-weight: 600;
+  opacity: 0.7;
+  padding: 0.35em 0;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.8em;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  cursor: default;
+}
+
+.calendar-day.empty {
+  visibility: hidden;
+}
+
+.calendar-day.has-class {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.calendar-day.has-class:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.calendar-day.selected {
+  background: #ffffff;
+  color: #1b1f22;
+  border-color: #ffffff;
+}
+
+.calendar-day-detail {
+  margin-bottom: 1.5em;
+  padding: 1em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.calendar-day-detail h3 {
+  margin: 0 0 0.75em;
+  font-size: 1em;
+}
+
+.schedule-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.schedule-list > li {
+  list-style: none;
+  margin-bottom: 0.75em;
+}
+
+.session-cards {
+  display: grid;
+  gap: 0.75em;
+}
+
+.session-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75em;
+  padding: 1em;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.schedule-meta {
+  margin: 0.25em 0 0;
+  font-size: 0.9em;
+  opacity: 0.85;
+}
+
+.schedule-location {
+  margin: 0.35em 0 0;
+  font-size: 0.9em;
+}
+
+.form-success {
+  display: none;
+  margin-top: 1em;
+  padding: 0.75em 1em;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+.form-success.is-visible {
+  display: block;
+}
