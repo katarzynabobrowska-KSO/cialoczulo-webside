@@ -1,0 +1,31 @@
+/*
+ * GT Alpina — czcionka marki (licencja Grilli Type)
+ * Plik: fonts/GT Alpina/GT-Alpina-Condensed-Bold.otf
+ *
+ * Masz na razie wariant Bold — używany na całej stronie.
+ * Gdy dodasz Regular / inne grubości, dopisz kolejne @font-face poniżej.
+ */
+
+@font-face {
+  font-family: "GT Alpina";
+  src: url("../../fonts/GT Alpina/GT-Alpina-Condensed-Bold.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GT Alpina";
+  src: url("../../fonts/GT Alpina/GT-Alpina-Condensed-Bold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "GT Alpina";
+  src: url("../../fonts/GT Alpina/GT-Alpina-Condensed-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}

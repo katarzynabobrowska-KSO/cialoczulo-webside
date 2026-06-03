@@ -1,5 +1,44 @@
 /* Kalendarz i lista zajęć — dopasowanie do szablonu Dimension */
 
+/* Czcionka marki zamiast domyślnej Source Sans Pro */
+body,
+input,
+select,
+textarea,
+button {
+  font-family: "GT Alpina", "Source Sans Pro", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+strong, b,
+.button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  font-family: "GT Alpina", "Source Sans Pro", sans-serif;
+}
+
+/* Logo marki zamiast okręgu z ikoną */
+#header .logo {
+  width: auto;
+  height: auto;
+  line-height: normal;
+  border: none;
+  border-radius: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+#header .logo .logo-img {
+  display: block;
+  max-height: 9rem;
+  width: auto;
+  max-width: min(220px, 75vw);
+  height: auto;
+}
+
 .hint {
   font-size: 0.85em;
   opacity: 0.85;
