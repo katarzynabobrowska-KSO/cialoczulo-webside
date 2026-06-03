@@ -83,9 +83,11 @@ h3.major {
   letter-spacing: 0.1em;
 }
 
-/* Panele sekcji — niebieski marki */
+/* Panele sekcji — niebieski marki, lekko przezroczyste */
 #main article {
-  background-color: rgba(4, 59, 198, 0.92) !important;
+  background-color: rgba(4, 59, 198, 0.72) !important;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 /* Przyciski */
@@ -401,4 +403,22 @@ input[type="button"] {
 
 .event-card .class-type-actions .button {
   letter-spacing: 0.1rem;
+}
+
+/* Tło landing page — zdjęcie Kasia, wypełnienie (cover) */
+#bg:after {
+  background-image: url("../../images/Kasia_31.png") !important;
+  background-position: center center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+#bg:before {
+  background-image: linear-gradient(
+      to top,
+      rgba(4, 59, 198, 0.55),
+      rgba(4, 59, 198, 0.35)
+    ),
+    url("../../images/overlay.png") !important;
+  background-size: auto, 256px 256px !important;
 }
