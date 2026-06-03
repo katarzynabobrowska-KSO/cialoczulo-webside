@@ -90,6 +90,29 @@ h3.major {
   backdrop-filter: blur(10px);
 }
 
+/* Bannery sekcji — jak pic01/pic02 (960×320, 3:1) */
+#o-mnie .image.main,
+#cennik .image.main {
+  aspect-ratio: 3 / 1;
+  overflow: hidden;
+  margin: 2.5rem 0;
+}
+
+#o-mnie .image.main img,
+#cennik .image.main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#o-mnie .image.main img {
+  object-position: center 35%;
+}
+
+#cennik .image.main img {
+  object-position: center 55%;
+}
+
 /* Przyciski */
 .button,
 button,
