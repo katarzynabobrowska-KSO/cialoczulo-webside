@@ -85,7 +85,7 @@ h3.major {
 
 /* Panele sekcji — niebieski marki, lekko przezroczyste */
 #main article {
-  background-color: rgba(4, 59, 198, 0.72) !important;
+  background-color: rgba(4, 59, 198, 0.48) !important;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
